@@ -15,6 +15,14 @@ DROP TABLE IF EXISTS "pricing_scheme";
 DROP TABLE IF EXISTS "sibling_discount";
 DROP TABLE IF EXISTS "student";
 DROP TABLE IF EXISTS "student_payment";
+DROP TABLE IF EXISTS "ensemble";
+DROP TABLE IF EXISTS "group_lesson";
+DROP TABLE IF EXISTS "individual_lesson";
+DROP TABLE IF EXISTS "instrument_rental";
+DROP TABLE IF EXISTS "student_ensemble";
+DROP TABLE IF EXISTS "student_group_lesson";
+DROP TABLE IF EXISTS "student_individual_lesson";
+
 
 INSERT INTO contact_details (personal_number,first_name,last_name,role,age,street,zip,city)
 VALUES
@@ -228,6 +236,111 @@ VALUES
   ('XRJ24HKN0FI',9,4,8,'cubilia',0),
   ('MUU85CIW2GC',2,6,10,'montes,',0),
   ('XNC90NZT0QP',4,1,4,'Aenean',0);
+
+INSERT INTO ensemble (lesson_id,genre,minimum_number_of_students,maximum_number_of_students)
+VALUES
+  ('YAP76IYE6JW','est',10,40),
+  ('UXG09LSD8KO','vel',10,40),
+  ('NBJ12AMB4BN','Quisque',10,40),
+  ('VPA32QMJ8AX','vitae',10,40),
+  ('COG71RTB4DH','est',10,40),
+  ('DYP82UTI7ZX','elit,',10,40),
+  ('SBM52LRE7VC','id',10,40),
+  ('HIX88SZK4YG','erat',10,40),
+  ('VHW74EBY0BQ','mus.',10,40),
+  ('IPF43CXN1TY','turpis.',10,40);
+
+INSERT INTO group_lesson (lesson_id,minimum_number_of_students,maximum_number_of_students)
+VALUES
+  ('QLH41GHQ8CU',10,40),
+  ('HTL16JHI5BO',10,40),
+  ('ESQ25QBR8VR',10,40),
+  ('EUM17UTH3PP',10,40),
+  ('QHI22KZT0CU',10,40),
+  ('AEJ18MXG5AB',10,40),
+  ('YYV68UQU3MF',10,40),
+  ('GSP70JYM8EI',10,40),
+  ('VGE37VVV9TK',10,40),
+  ('GYX13PYV7TO',10,40);
+
+INSERT INTO individual_lesson (lesson_id)
+VALUES
+  ('FIW96XEI7DG'),
+  ('YGJ14CPO6IT'),
+  ('QBK32XUT7ND'),
+  ('HTM13ZUL9RH'),
+  ('ETQ52DDX2RB'),
+  ('DYT04YYD8EM'),
+  ('XXY48ZFF0PQ'),
+  ('IJQ41DOH2TP'),
+  ('HJT45IMM4GL'),
+  ('DBV36AXG1NH');
+
+INSERT INTO instrument_rental (instrument_id,staff_id,student_id,instrument_fee,start_date,end_date)
+VALUES
+  ('OFK12JEJ7SQ','KWA04HVO8IY','OTT64LXY5EH',336,'Sep 5, 2023','Dec 1, 2021'),
+  ('GFY61BVK5DN','TTH17BWR0RA','IGM62JEI5OT',343,'Feb 9, 2022','Aug 1, 2023'),
+  ('GVJ78XWY7SW','CRD21UIM0OW','UXX67PYP4PO',362,'Jul 18, 2022','Dec 26, 2022'),
+  ('DUK73REY7UE','NYF50MAF4YK','UJX39PKK5HO',403,'Jun 30, 2022','Jun 18, 2022'),
+  ('KMB99TLZ2QW','ZOV45YQB1DT','COK87GTO1SK',370,'Sep 19, 2022','Dec 3, 2022'),
+  ('FJR13GNH5FS','MRT57YFM6OR','CGT57RHG3CW',311,'Aug 29, 2022','Aug 12, 2022'),
+  ('WUT74CMY8NH','BHP02PTB9UZ','ATT13DAQ9SM',428,'Jul 27, 2022','Aug 14, 2023'),
+  ('PLV38FLP3IC','XUV32WNM1UP','GOH91SVO0IL',519,'Mar 10, 2023','Jul 4, 2022'),
+  ('GFO45TGV4NW','AJR04WLI4NE','DWZ86DHG5CR',370,'Jun 15, 2022','Sep 18, 2022'),
+  ('NCX87HKN4SM','YMM08RNP1PB','QFL27QLP4VM',365,'Feb 1, 2023','Jul 17, 2023');
+
+INSERT INTO student_ensemble (lesson_id,student_id)
+VALUES
+  ('QME37SJZ4EC','PTE65BPR4TY'),
+  ('UOE99BUY8IT','DJK65IVX5MO'),
+  ('ILO81FRW3UV','BBR55FGK5UI'),
+  ('OLW13KKS7QU','VNP25EFB5WP'),
+  ('PKG37HHN7BW','UYL85GTK8MX'),
+  ('BPE51UKX5MU','MDQ61MEU1YW'),
+  ('DUG57TWR9XS','AQI10KEV4IH'),
+  ('HKT81TXM2WM','WHW24WCZ4UL'),
+  ('OOW10QRN2CX','HRH89XWH3PK'),
+  ('BTU75URS6AU','THH83RTD9LP');
+
+INSERT INTO student_group_lesson (lesson_id,student_id)
+VALUES
+  ('PKG70WWJ3RI','PAD20UOC3IB'),
+  ('ZYM22ALY4SW','GQN67TLP5LZ'),
+  ('QUM73PMW1DV','JDV53FUT5JF'),
+  ('SCR02KSB2UZ','RNR47NSD8VL'),
+  ('UIO47AQK2FP','YAS44JFT7KR'),
+  ('UIP29ORP2PT','IIX62YEP8TS'),
+  ('GLL21RCJ2XO','KUN86SIG6CL'),
+  ('KHY44NHK0NP','DWH42QIQ7GE'),
+  ('XIG31MKV5YL','MWJ39YYJ0RO'),
+  ('BCG99LKQ3JL','BTG25RUM1IG');
+
+INSERT INTO student_individual_lesson (lesson_id,student_id)
+VALUES
+  ('TNI34MDJ1IF','KUH28XUY8UM'),
+  ('BUW73ERU3LV','DDD27SKD5FM'),
+  ('GTD75FCW5DC','OTK56UVT8VO'),
+  ('VXM42EWT5VN','GXH86CRL7EZ'),
+  ('ZUN54LJP5BF','KEM13BXL7QN'),
+  ('KPL16KWM7XL','RFV34UCY2IQ'),
+  ('OQW48KPS5YO','DHI83UMO5QQ'),
+  ('EBM61GWS7UR','LFO63NJY2BC'),
+  ('JDX66ZJJ4IH','IDQ48YFB8JQ'),
+  ('FBD23MUR6OB','ELK31NMK7OM');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
