@@ -7,6 +7,11 @@
     it's most likely easier to understand the result if you do place all numbers for a particular month on the same row, 
     and it's an interesting exercise, therefore you're encouraged to try. */
 
+    SELECT EXTRACT(MONTH FROM music_lesson.date) AS Month, COUNT(*) AS number_of_lessons
+    FROM music_lesson
+    WHERE EXTRACT(YEAR FROM music_lesson.date) = "2022"
+    GROUP BY EXTRACT(MONTH FROM music_lesson.date);
+
     SELECT EXTRACT(MONTH FROM music_lesson.date) AS Month, lesson_type, COUNT(*) AS number_of_lessons
     FROM music_lesson
     WHERE EXTRACT(YEAR FROM music_lesson.date) = '2022'
@@ -36,10 +41,60 @@
         GROUP BY student.student_id) as number_of_siblings 
     GROUP BY total_siblings ORDER BY total_siblings ASC;
 
-
-
     /* List all instructors who has given more than a specific number of lessons during the current month. 
     Sum all lessons, independent of type, and sort the result by the number of given lessons. 
     This query will be used to find instructors risking to work too much, and will be executed daily. */
+
+    SELECT * FROM 
+        (SELECT COUNT(*) AS number_of_lessons, employment_id AS instructor FROM music_lesson
+        WHERE TO_CHAR(date, 'YYYY-MM') = TO_CHAR(current_date, 'YYYY-MM')
+        GROUP BY employment_id
+        ORDER BY number_of_lessons DESC)
+        AS instructor WHERE number_of_lessons > 2;
+    
+    SELECT * FROM 
+        (SELECT COUNT(*) AS number_of_lessons, employment_id AS instructor, lesson_type FROM music_lesson
+        WHERE TO_CHAR(date, 'YYYY-MM') = TO_CHAR(current_date, 'YYYY-MM')
+        GROUP BY employment_id, lesson_type
+        ORDER BY number_of_lessons DESC)
+        AS instructor WHERE number_of_lessons > 4;
+    
+    CREATE MATERIALIZED VIEW number_of_lessons AS
+        SELECT * FROM 
+            (SELECT COUNT(*) AS number_of_lessons, employment_id AS instructor, lesson_type FROM music_lesson
+            WHERE TO_CHAR(date, 'YYYY-MM') = TO_CHAR(current_date, 'YYYY-MM')
+            GROUP BY employment_id, lesson_type
+            ORDER BY number_of_lessons DESC)
+            AS instructor WHERE number_of_lessons > 4;
+
+    /* List all ensembles held during the next week, sorted by music genre and weekday. 
+    For each ensemble tell whether it's full booked, has 1-2 seats left or has more seats left.
+    Hint: you might want to use a CASE statement in your query to produce the desired output. */
+
+    SELECT music_lesson.lesson_type AS type, music_lesson.date AS date_of_lesson, ensemble.genre AS genre,
+       (CASE 
+	        WHEN COUNT (student_ensemble.student_id) = (maximum_number_of_students) THEN 'Fully booked'
+	        WHEN COUNT (student_ensemble.student_id) = (maximum_number_of_students - 1) THEN '1 seats left'
+            WHEN COUNT (student_ensemble.student_id) = (maximum_number_of_students - 2) THEN '2 seats left'
+            WHEN COUNT (student_ensemble.student_id) < (maximum_number_of_students - 2) THEN 'Many free seats'
+        END)
+    FROM music_lesson, ensemble, student_ensemble
+    WHERE music_lesson.id = ensemble.lesson_id AND ensemble.lesson_id = student_ensemble.lesson_id AND date_trunc('week', current_date + interval '1 week') = date_trunc('week', date)
+    GROUP BY type , date_of_lesson , genre, maximum_number_of_students;
+
+    CREATE MATERIALIZED VIEW number_of_lessons AS
+	SELECT music_lesson.lesson_type AS type, music_lesson.date AS date_of_lesson , ensemble.genre AS genre,
+        (CASE 
+	        WHEN COUNT (student_ensemble.student_id) = (maximum_number_of_students) THEN 'Fully booked'
+	        WHEN COUNT (student_ensemble.student_id) = (maximum_number_of_students - 1) THEN '1 seats left'
+            WHEN COUNT (student_ensemble.student_id) = (maximum_number_of_students - 2) THEN '2 seats left'
+            WHEN COUNT (student_ensemble.student_id) < (maximum_number_of_students - 2) THEN 'Many free seats'
+        END)
+	FROM music_lesson, ensemble, student_ensemble
+	WHERE music_lesson.id = ensemble.lesson_id AND ensemble.lesson_id = student_ensemble.lesson_id AND date_trunc('week', current_date + interval '1 week') = date_trunc('week', date)
+	GROUP BY type , date_of_lesson , genre, maximum_number_of_students;
+
+
+
 
     
