@@ -1,0 +1,66 @@
+--Query 1:
+    GroupAggregate  (cost=1.76..1.78 rows=1 width=16) (actual time=0.122..0.132 rows=3 loops=1)
+       Group Key: lesson_type
+       ->  Sort  (cost=1.76..1.76 rows=1 width=8) (actual time=0.109..0.114 rows=50 loops=1)
+             Sort Key: lesson_type
+             Sort Method: quicksort  Memory: 27kB
+             ->  Seq Scan on music_lesson  (cost=0.00..1.75 rows=1 width=8) (actual time=0.041..0.059 rows=50 loops=1)
+                   Filter: (EXTRACT(year FROM date) = '2023'::numeric)
+     Planning Time: 0.235 ms
+     Execution Time: 0.194 ms
+
+--Query 2:
+    GroupAggregate  (cost=2.62..2.80 rows=10 width=16) (actual time=0.116..0.122 rows=2 loops=1)
+       Group Key: number_of_siblings.total
+       ->  Sort  (cost=2.62..2.65 rows=10 width=8) (actual time=0.105..0.110 rows=10 loops=1)
+             Sort Key: number_of_siblings.total
+             Sort Method: quicksort  Memory: 25kB
+             ->  Subquery Scan on number_of_siblings  (cost=2.25..2.45 rows=10 width=8) (actual time=0.075..0.084 rows=10 loops=1)
+                   ->  HashAggregate  (cost=2.25..2.35 rows=10 width=12) (actual time=0.074..0.081 rows=10 loops=1)
+                         Group Key: student.id
+                         Batches: 1  Memory Usage: 24kB
+                         ->  Hash Left Join  (cost=1.07..2.20 rows=10 width=8) (actual time=0.052..0.062 rows=10 loops=1)
+                               Hash Cond: (student.id = sibling.student_id)
+                               ->  Seq Scan on student  (cost=0.00..1.10 rows=10 width=4) (actual time=0.011..0.013 rows=10 loops=1)
+                               ->  Hash  (cost=1.03..1.03 rows=3 width=4) (actual time=0.016..0.017 rows=3 loops=1)
+                                     Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                                     ->  Seq Scan on sibling  (cost=0.00..1.03 rows=3 width=4) (actual time=0.006..0.008 rows=3 loops=1)
+     Planning Time: 0.557 ms
+     Execution Time: 0.226 ms
+
+--Query 3:
+    Sort  (cost=2.29..2.30 rows=1 width=12) (actual time=0.291..0.293 rows=5 loops=1)
+       Sort Key: (count(*)) DESC
+       Sort Method: quicksort  Memory: 25kB
+       ->  GroupAggregate  (cost=2.26..2.28 rows=1 width=12) (actual time=0.225..0.246 rows=5 loops=1)
+             Group Key: music_lesson.instructor_id
+             Filter: (count(*) > 2)
+             ->  Sort  (cost=2.26..2.26 rows=1 width=4) (actual time=0.209..0.218 rows=50 loops=1)
+                   Sort Key: music_lesson.instructor_id
+                   Sort Method: quicksort  Memory: 25kB
+                   ->  Seq Scan on music_lesson  (cost=0.00..2.25 rows=1 width=4) (actual time=0.034..0.176 rows=50 loops=1)
+                         Filter: (to_char((date)::timestamp with time zone, 'YYYY-MM'::text) = to_char((CURRENT_DATE)::timestamp with time zone, 'YYYY-MM'::text))
+     Planning Time: 0.437 ms
+     Execution Time: 0.402 ms
+
+ --Query 4:
+    GroupAggregate  (cost=4.36..4.41 rows=1 width=57) (actual time=0.238..0.243 rows=2 loops=1)
+      Group Key: music_lesson.lesson_type, music_lesson.date, ensemble.genre, ensemble.maximum_number_of_students
+      ->  Sort  (cost=4.36..4.37 rows=1 width=29) (actual time=0.220..0.225 rows=2 loops=1)
+            Sort Key: music_lesson.lesson_type, music_lesson.date, ensemble.genre, ensemble.maximum_number_of_students
+            Sort Method: quicksort  Memory: 25kB
+            ->  Nested Loop  (cost=2.40..4.35 rows=1 width=29) (actual time=0.175..0.185 rows=2 loops=1)
+                  Join Filter: (music_lesson.id = student_ensemble.lesson_id)
+                  ->  Hash Join  (cost=2.26..3.39 rows=1 width=33) (actual time=0.152..0.159 rows=2 loops=1)
+                        Hash Cond: (ensemble.lesson_id = music_lesson.id)
+                        ->  Seq Scan on ensemble  (cost=0.00..1.10 rows=10 width=17) (actual time=0.018..0.020 rows=10 loops=1)
+                        ->  Hash  (cost=2.25..2.25 rows=1 width=16) (actual time=0.102..0.103 rows=10 loops=1)
+                              Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                              ->  Seq Scan on music_lesson  (cost=0.00..2.25 rows=1 width=16) (actual time=0.027..0.081 rows=10 loops=1)
+                                    Filter: (date_trunc('week'::text, (CURRENT_DATE + '7 days'::interval)) = date_trunc('week'::text, (date)::timestamp with time zone))
+                                    Rows Removed by Filter: 40
+                  ->  Index Only Scan using pk_student_ensemble on student_ensemble  (cost=0.14..0.95 rows=1 width=8) (actual time=0.009..0.009 rows=1 loops=2)
+                        Index Cond: (lesson_id = ensemble.lesson_id)
+                        Heap Fetches: 0
+    Planning Time: 4.743 ms
+    Execution Time: 0.342 ms
